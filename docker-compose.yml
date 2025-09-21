@@ -1,0 +1,27 @@
+---
+services:
+  postgresql:
+    image: postgres:15
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+    shm_size: 1g
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        RAILS_ENV: $RAILS_ENV
+    volumes:
+      - .:/rails
+    env_file:
+      - .env
+    ports:
+      - 80:80
+    depends_on:
+      - postgresql
+
+volumes:
+  postgresql-data:
