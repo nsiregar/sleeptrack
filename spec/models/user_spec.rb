@@ -34,10 +34,10 @@ RSpec.describe User, type: :model do
 
       context 'when already follow the user' do
         it 'should not allowed' do
-          user_1.follows.create!(followable_id: user_2.id, followable_type: user_2.class.name)
+          user_1.follow_user(user_2)
 
           expect do
-            user_1.follows.create!(followable_id: user_2.id, followable_type: user_2.class.name)
+            user_1.follow_user(user_2)
           end.to raise_error ActiveRecord::RecordNotUnique
         end
       end

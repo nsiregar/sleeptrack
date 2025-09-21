@@ -9,4 +9,8 @@ class User < ApplicationRecord
 
   validates_presence_of :name
   validates_uniqueness_of :name
+
+  def follow_user(user)
+    follows.create!(followable_id: user.id, followable_type: user.class.name)
+  end
 end
