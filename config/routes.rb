@@ -11,7 +11,8 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :users, only: [ :create ] do
-        post "follow/:following_id", to: "users#follow", as: "follow"
+        post "follow/:following_id", to: "users#follow"
+        delete "follow/:following_id", to: "users#unfollow"
 
         resources :sleeps, only: [ :index ] do
           collection do

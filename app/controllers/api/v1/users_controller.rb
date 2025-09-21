@@ -23,6 +23,18 @@ class Api::V1::UsersController < ApplicationController
     render json: { errors: "User can not follow it self" }, status: :unprocessable_content
   end
 
+  def unfollow
+    if followable_user.nil?
+      render json: { errors: "Followable user not found" }, status: :unprocessable_content
+    else
+      record = current_user.unfollow_user(followable_user)
+
+      render json: { data: record }, status: :ok
+    end
+  rescue ActiveRecord::ActiveRecordError
+    render json: { errors: "User is not following followable" }, status: :unprocessable_content
+  end
+
   private
 
   def user_params

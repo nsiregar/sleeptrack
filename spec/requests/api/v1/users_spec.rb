@@ -70,4 +70,39 @@ RSpec.describe "Api::V1::Users", type: :request do
       end
     end
   end
+
+  describe "DELETE /api/v1/users/:id/follow/:following_id" do
+    let(:user_1) { create :user }
+    let(:user_2) { create :user }
+
+    context 'when user never follow' do
+      it 'returns errors' do
+        delete "/api/v1/users/#{user_1.id}/follow/#{user_2.id}"
+
+        expect(response).to have_http_status :unprocessable_content
+        expect(response_json['errors']).to include "User is not following followable"
+      end
+    end
+
+    context 'when user already follow' do
+      it 'should remove follow relationship' do
+        user_1.follow_user(user_2)
+
+        delete "/api/v1/users/#{user_1.id}/follow/#{user_2.id}"
+
+        expect(response).to have_http_status :ok
+        expect(user_1.following_users.first).to be_nil
+        expect(user_2.followers.first).to be_nil
+      end
+    end
+
+    context 'when user unfollow non exists user' do
+      it 'returns errors' do
+        delete "/api/v1/users/#{user_1.id}/follow/100"
+
+        expect(response).to have_http_status :unprocessable_content
+        expect(response_json['errors']).to include "Followable user not found"
+      end
+    end
+  end
 end
