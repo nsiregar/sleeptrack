@@ -10,7 +10,13 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :users, only: [ :create ]
+      resources :users, only: [ :create ] do
+        resources :sleeps, only: [ :index ] do
+          collection do
+            post "clock_in", to: "sleeps#clock_in"
+          end
+        end
+      end
     end
   end
 end
