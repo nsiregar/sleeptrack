@@ -1,4 +1,10 @@
 class Api::V1::SleepsController < ApplicationController
+  def index
+    follows_sleep_records = current_user.following_users.last_week_sleep_records
+
+    render json: { data: follows_sleep_records }, status: :ok
+  end
+
   def clock_in
     last_sleep_record = current_user.sleeps.last
     if last_sleep_record.present? && last_sleep_record&.end.nil?
