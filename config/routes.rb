@@ -14,6 +14,7 @@ Rails.application.routes.draw do
         resources :sleeps, only: [ :index ] do
           collection do
             post "clock_in", to: "sleeps#clock_in"
+            patch "clock_out", to: "sleeps#clock_out"
           end
         end
       end
