@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_21_130943) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_21_173503) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -21,8 +21,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_21_130943) do
     t.bigint "follower_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["followable_id", "followable_type"], name: "fk_followables", unique: true
     t.index ["followable_type", "followable_id"], name: "index_follows_on_followable"
+    t.index ["follower_id", "follower_type", "followable_id", "followable_type"], name: "index_follows_on_follower_and_followable", unique: true
     t.index ["follower_id", "follower_type"], name: "fk_follows"
     t.index ["follower_type", "follower_id"], name: "index_follows_on_follower"
   end
@@ -34,6 +34,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_21_130943) do
     t.integer "duration"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_sleeps_on_created_at"
+    t.index ["duration"], name: "index_sleeps_on_duration"
     t.index ["user_id"], name: "index_sleeps_on_user_id"
   end
 

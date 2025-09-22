@@ -1,0 +1,12 @@
+services:
+  k6:
+    image: grafana/k6:latest
+    container_name: k6_runner
+    command: run /scripts/sleeps_index.js
+    volumes:
+      - ./k6/scripts:/scripts
+    networks:
+      - default
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+

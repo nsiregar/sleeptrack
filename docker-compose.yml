@@ -8,6 +8,9 @@ services:
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
 
+  redis:
+    image: redis:8-alpine
+
   app:
     build:
       context: .

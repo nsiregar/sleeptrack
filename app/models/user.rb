@@ -10,15 +10,6 @@ class User < ApplicationRecord
   validates_presence_of :name
   validates_uniqueness_of :name
 
-  scope :last_week_sleep_records, lambda {
-    joins(sleeps: :user)
-      .where(sleeps: { created_at: 1.week.ago..Time.now })
-      .where.not(sleeps: { end: nil })
-      .order(duration: :desc)
-      .select("sleeps.*")
-      .distinct
-  }
-
   def follow_user(user)
     follows.create!(followable_id: user.id, followable_type: user.class.name)
   end
