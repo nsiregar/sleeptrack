@@ -14,6 +14,11 @@ RSpec.describe "Performance", type: :request do
         create(:sleep, user: followed_user, created_at: i.days.ago, start: i.days.ago, end: i.days.ago + 8.hours, duration: 8 * 3600)
       end
     end
+
+    # create user sleep records
+    10_000.times do |i|
+      create(:sleep, user: user, created_at: i.days.ago, start: i.days.ago, end: i.days.ago + 8.hours, duration: 8 * 3600)
+    end
   end
 
   describe "GET /api/v1/users/:id/sleeps" do
@@ -34,6 +39,18 @@ RSpec.describe "Performance", type: :request do
         x.report("unfollow user") do
           sample_user = followed_users.sample
           delete "/api/v1/users/#{user.id}/follow/#{sample_user.id}"
+        end
+
+        x.compare!
+      end
+    end
+  end
+
+  describe "POST /api/v1/users/:id/sleeps/clock_in" do
+    it "benchmark clock in cation" do
+      Benchmark.ips do |x|
+        x.report("clock_in") do
+          post "/api/v1/users/#{user.id}/sleeps/clock_in"
         end
 
         x.compare!

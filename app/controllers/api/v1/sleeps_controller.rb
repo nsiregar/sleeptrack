@@ -25,8 +25,12 @@ class Api::V1::SleepsController < ApplicationController
     if last_sleep_record.present? && last_sleep_record&.end.nil?
       render json: { errors: "User have active sleep record" }, status: :unprocessable_content
     else
-      record = current_user.sleeps.create(start: Time.zone.now)
-      render json: { data: record }, status: :created
+      current_user.sleeps.create(start: Time.zone.now)
+
+      pagy, records = pagy(current_user.sleeps.order(created_at: :desc), limit: PAGINATION_LIMIT)
+
+      pagy_headers_merge(pagy)
+      render json: { data: records }, status: :created
     end
   end
 
