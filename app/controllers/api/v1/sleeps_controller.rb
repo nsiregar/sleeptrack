@@ -27,7 +27,8 @@ class Api::V1::SleepsController < ApplicationController
     else
       current_user.sleeps.create(start: Time.zone.now)
 
-      pagy, records = pagy(current_user.sleeps.order(created_at: :desc), limit: PAGINATION_LIMIT)
+      sleep_records = Sleep.where(user_id: current_user.id).order(created_at: :desc)
+      pagy, records = pagy(sleep_records, limit: PAGINATION_LIMIT)
 
       pagy_headers_merge(pagy)
       render json: { data: records }, status: :created

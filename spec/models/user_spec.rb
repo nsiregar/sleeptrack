@@ -56,5 +56,28 @@ RSpec.describe User, type: :model do
   end
 
   describe '#unfollow user' do
+    let(:user_1) { create :user }
+    let(:user_2) { create :user }
+
+    context 'when already following' do
+      before do
+        user_1.follow_user user_2
+      end
+
+      it 'should unfollow user' do
+        user_1.unfollow_user user_2
+
+        expect(user_1.followings).to be_empty
+        expect(user_2.followers).to be_empty
+      end
+    end
+
+    context 'when never follow' do
+      it 'should raise error' do
+        expect do
+          user_1.unfollow_user user_2
+        end.to raise_error ActiveRecord::ActiveRecordError
+      end
+    end
   end
 end

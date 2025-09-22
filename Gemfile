@@ -58,3 +58,5 @@ group :development, :test do
 
   gem "rails-controller-testing", require: false
 end
+
+gem "sidekiq", "~> 8.0"

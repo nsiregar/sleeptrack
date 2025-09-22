@@ -8,7 +8,10 @@ services:
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
 
-  redis:
+  redis-cache:
+    image: redis:8-alpine
+
+  redis-worker:
     image: redis:8-alpine
 
   app:
@@ -25,6 +28,21 @@ services:
       - 80:80
     depends_on:
       - postgresql
+      - redis-cache
+
+  sidekiq:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        RAILS_ENV: $RAILS_ENV
+    command: bundle exec sidekiq
+    volumes:
+      - .:/rails
+    env_file:
+      - .env
+    depends_on:
+      - redis-worker
 
 volumes:
   postgresql-data:

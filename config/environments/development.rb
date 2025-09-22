@@ -33,7 +33,7 @@ Rails.application.configure do
   end
 
   # Change to :null_store to avoid any caching.
-  config.cache_store = :redis_cache_store, { url: ENV["REDIS_URL"] }
+  config.cache_store = :redis_cache_store, { url: ENV["REDIS_CACHE_URL"] }
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
