@@ -37,7 +37,7 @@ class Api::V1::UsersController < ApplicationController
     cache_key = [ current_user.cache_key_with_version, :v1_user_feeds, params[:page] ]
 
     pagy_headers, records = Rails.cache.fetch(cache_key, expires_in: 5.minutes, race_condition_ttl: 60) do
-      sleep_records = Sleep.where(user_id: current_user.following_user_ids)
+      sleep_records = Sleep.where(user_id: current_user.following_users)
                           .last_week
                           .finished
                           .sorted_by_duration
