@@ -7,10 +7,7 @@ class Api::V1::SleepsController < ApplicationController
     cache_key = [ current_user.cache_key_with_version, :v1_sleep_records, params[:page] ]
 
     pagy_headers, records = Rails.cache.fetch(cache_key, expires_in: 5.minutes, race_condition_ttl: 60) do
-      sleep_records = Sleep.where(user_id: current_user.following_user_ids)
-                          .last_week
-                          .finished
-                          .sorted_by_duration
+      sleep_records = Sleep.where(user_id: current_user.id).order(created_at: :desc)
 
       pagy, records = pagy(sleep_records, limit: PAGINATION_LIMIT)
       [ pagy_headers(pagy), records.to_a ]
@@ -26,13 +23,13 @@ class Api::V1::SleepsController < ApplicationController
       if last_sleep_record.present? && last_sleep_record&.end.nil?
         render json: { errors: "User have active sleep record" }, status: :unprocessable_content
       else
-        current_user.sleeps.create(start: Time.zone.now)
+        records = current_user.sleeps.build(start: Time.zone.now)
 
-        sleep_records = Sleep.where(user_id: current_user.id).order(created_at: :desc)
-        pagy, records = pagy(sleep_records, limit: PAGINATION_LIMIT)
-
-        pagy_headers_merge(pagy)
-        render json: { data: records }, status: :created
+        if records.save
+          render json: { data: records }, status: :created
+        else
+          render json: { errors: records.errors.full_messages }, status: :unprocessable_content
+        end
       end
     end
   end

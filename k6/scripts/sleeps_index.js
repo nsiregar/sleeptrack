@@ -19,7 +19,7 @@ export const options = {
 
 export default function () {
   // The user_id=1 parameter will authenticate as our main benchmark user.
-  const res = http.get('http://host.docker.internal:80/api/v1/users/1/sleeps');
+  const res = http.get('http://host.docker.internal:80/api/v1/users/1/feeds');
 
   // Check that the request was successful.
   check(res, {

@@ -22,10 +22,22 @@ RSpec.describe "Performance", type: :request do
   end
 
   describe "GET /api/v1/users/:id/sleeps" do
+    it "benchmarks fetching sleep records" do
+      Benchmark.ips do |x|
+        x.report("get sleep records") do
+          get "/api/v1/users/#{user.id}/sleeps"
+        end
+
+        x.compare!
+      end
+    end
+  end
+
+  describe "GET /api/v1/users/:id/feeds" do
     it "benchmarks fetching sleep records of followed users" do
       Benchmark.ips do |x|
-        x.report("get sleep feeds") do
-          get "/api/v1/users/#{user.id}/sleeps"
+        x.report("get friend's sleep feeds") do
+          get "/api/v1/users/#{user.id}/feeds"
         end
 
         x.compare!
@@ -51,6 +63,7 @@ RSpec.describe "Performance", type: :request do
       Benchmark.ips do |x|
         x.report("clock_in") do
           post "/api/v1/users/#{user.id}/sleeps/clock_in"
+          user.sleeps.last.update!(end: Time.zone.now)
         end
 
         x.compare!
