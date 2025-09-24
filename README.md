@@ -9,6 +9,25 @@ This is a RESTful API for a sleep tracking application. It allows users to track
 * Follow and unfollow other users
 * View a paginated feed of friends' sleep data
 
+## Requirements
+
+* Docker
+* docker-compose
+
+## Run projects
+
+To run project you should create new `.env` based on `.env.example`
+
+```bash
+cp .env.example .env
+```
+
+Then you can run docker container
+
+```bash
+docker compose up -d
+```
+
 ## Performance Updates
 
 Performance has been a key consideration during development. The following updates have been made to improve the API's performance:
@@ -23,6 +42,12 @@ Performance has been a key consideration during development. The following updat
 * **Pagination**: The API uses the `pagy` gem to paginate results in the `Api::V1::SleepsController`. The `index` and `clock_in` actions both use `pagy` to limit the number of records returned to 10 per page. The pagination headers are then merged into the response.
 
 * **Background Jobs**: The API uses the `ActiveJob` with `sidekiq` to process follow / unfollow users, since this process not require immediate feedback.
+
+## Considerations
+
+* Requirements to returns all user sleep records after committing clock in may not wise, because it still returns large amount of data and require additional computation to load the records. Considering this, user sleep records is moved to new endpoint `api/v1/users/:id/sleeps` with support of caching and pagination.
+* Added `.with_lock` pessimistic lock in clock in/out endpoint, this may affecting performance but it helps data integrity to prevent race condition.
+* Follow/Unfollow action does not require immediate feedback, so this process can be offloaded to the background jobs with discard capabilities when validation fails.
 
 ## Performance Testing with k6
 
