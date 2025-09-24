@@ -21,27 +21,31 @@ class Api::V1::SleepsController < ApplicationController
   end
 
   def clock_in
-    last_sleep_record = current_user.sleeps.last
-    if last_sleep_record.present? && last_sleep_record&.end.nil?
-      render json: { errors: "User have active sleep record" }, status: :unprocessable_content
-    else
-      current_user.sleeps.create(start: Time.zone.now)
+    current_user.with_lock do
+      last_sleep_record = current_user.sleeps.last
+      if last_sleep_record.present? && last_sleep_record&.end.nil?
+        render json: { errors: "User have active sleep record" }, status: :unprocessable_content
+      else
+        current_user.sleeps.create(start: Time.zone.now)
 
-      sleep_records = Sleep.where(user_id: current_user.id).order(created_at: :desc)
-      pagy, records = pagy(sleep_records, limit: PAGINATION_LIMIT)
+        sleep_records = Sleep.where(user_id: current_user.id).order(created_at: :desc)
+        pagy, records = pagy(sleep_records, limit: PAGINATION_LIMIT)
 
-      pagy_headers_merge(pagy)
-      render json: { data: records }, status: :created
+        pagy_headers_merge(pagy)
+        render json: { data: records }, status: :created
+      end
     end
   end
 
   def clock_out
-    last_sleep_record = current_user.sleeps.last
-    if last_sleep_record.present? && last_sleep_record.end.nil?
-      last_sleep_record.update!(end: Time.zone.now)
-      render json: { data: last_sleep_record }, status: :ok
-    else
-      render json: { errors: "User does not have active sleep record" }, status: :unprocessable_content
+    current_user.with_lock do
+      last_sleep_record = current_user.sleeps.last
+      if last_sleep_record.present? && last_sleep_record.end.nil?
+        last_sleep_record.update!(end: Time.zone.now)
+        render json: { data: last_sleep_record }, status: :ok
+      else
+        render json: { errors: "User does not have active sleep record" }, status: :unprocessable_content
+      end
     end
   end
 end
